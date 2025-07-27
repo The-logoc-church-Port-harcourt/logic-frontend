@@ -1,8 +1,9 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { PlayArrow } from '@mui/icons-material'
 import 'animate.css'
-import Navbar from '../../components/Navbar'
 import WelcomeHome from './WelcomeHome'
+import EventsHome from './Event'
+import Gallary from '../../components/Gallary'
 
 
 // Tiny base64 placeholder for instant loading
@@ -163,7 +164,6 @@ export default function HomeIndex() {
 
   return (
     <>
-    <Navbar />
     <Suspense 
       fallback={
         <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
@@ -239,6 +239,8 @@ export default function HomeIndex() {
       </div>
     </Suspense>
     <WelcomeHome />
+    <EventsHome />
+    <Gallary />
     </>
   )
 }
