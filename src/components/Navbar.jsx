@@ -44,7 +44,7 @@ export default function Navbar() {
 
   return (
     <nav className={`z-50 w-full px-4 fixed py-4 transition-all duration-300 ${
-      isScrolled ? 'bg-white shadow-lg' : ''
+      isScrolled ? 'bg-black shadow-lg' : ''
     }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
@@ -65,7 +65,7 @@ export default function Navbar() {
                   <button
                     onClick={toggleTrainingDropdown}
                     className={`relative flex items-center gap-1 px-4 py-2 font-medium transition-all duration-300 hover:scale-105 ${
-                      isScrolled ? 'text-gray-800' : 'text-white'
+                      isScrolled ? 'text-white' : 'text-white'
                     }`}
                   >
                     {link.name}
@@ -95,7 +95,7 @@ export default function Navbar() {
                   href={link.href}
                   onClick={() => handleLinkClick(link.name)}
                   className={`relative px-4 py-2 font-medium transition-all duration-300 hover:scale-105 ${
-                    isScrolled ? 'text-gray-800' : 'text-white'
+                    isScrolled ? 'text-white' : 'text-white'
                   }`}
                 >
                   {link.name}
@@ -118,7 +118,7 @@ export default function Navbar() {
           <button
             onClick={toggleMobileMenu}
             className={`p-2 rounded-lg hover:backdrop-blur-sm hover:bg-white/10 transition-colors duration-200 ${
-              isScrolled ? 'text-gray-800' : 'text-white'
+              isScrolled ? 'text-white' : 'text-white'
             }`}
           >
             {isMobileMenuOpen ? <Close className="text-2xl" /> : <Menu className="text-2xl" />}

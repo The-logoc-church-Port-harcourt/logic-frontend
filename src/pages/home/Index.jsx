@@ -2,6 +2,7 @@ import React, { useState, useEffect, Suspense } from 'react'
 import { PlayArrow } from '@mui/icons-material'
 import 'animate.css'
 import Navbar from '../../components/Navbar'
+import WelcomeHome from './WelcomeHome'
 
 
 // Tiny base64 placeholder for instant loading
@@ -237,6 +238,7 @@ export default function HomeIndex() {
         </div>
       </div>
     </Suspense>
+    <WelcomeHome />
     </>
   )
 }
