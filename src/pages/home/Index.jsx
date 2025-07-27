@@ -85,11 +85,11 @@ const FastImage = ({ src, alt, className, loading, isActive }) => {
       />
       
       {/* Loading indicator only for non-loaded images */}
-      {!imageLoaded && !imageError && currentSrc === placeholderImage && (
+      {/* {!imageLoaded && !imageError && currentSrc === placeholderImage && (
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
           <div className="w-8 h-8 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
