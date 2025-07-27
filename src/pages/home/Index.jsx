@@ -3,45 +3,50 @@ import { PlayArrow } from '@mui/icons-material'
 import 'animate.css'
 import Navbar from '../../components/Navbar'
 
-// Import images as modules for proper bundling
-import img1 from '/images/logic1.jpg'
-import img2 from '/images/DSC_7881.jpeg'
-import img3 from '/assets/DSC_4518.jpg'
-import img4 from '/assets/DSC_3738.jpg'
-import img5 from '/assets/DSC_9900.jpeg'
 
 // Tiny base64 placeholder for instant loading
 const placeholderImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNDQ0Ii8+PC9zdmc+"
 
 const heroData = [
     {
-    image: img1,
+    image: '/images/logic1.jpg',
     title: "Welcome to the LOGIC Church Port Harcourt",
     desc: "Here we preach the love of God for Us alone"
   },
   {
-    image: img2,
+    image: '/images/DSC_7881.jpeg',
      title: "Worship in Spirit and Truth",
     desc: "Come as you are and experience the transforming power of worship"
   },
   {
-    image: img1,
+    image: '/images/DSC_1730.jpg',
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
 
    {
-    image: img2,
+    image: '/images/DSC_1785.jpg',
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
    {
-    image: img1,
+    image: '/images/DSC_1869.jpg',
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
    {
-    image: img2,
+    image: '/images/DSC_3738.jpg',
+    title: "Experience God's Love Together",
+    desc: "Join our community in worship and fellowship every Sunday"
+  },
+     {
+    image: '/images/DSC_7975.jpeg',
+    title: "Experience God's Love Together",
+    desc: "Join our community in worship and fellowship every Sunday"
+  },
+
+    {
+    image: '/images/DSC_9900.jpeg',
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
