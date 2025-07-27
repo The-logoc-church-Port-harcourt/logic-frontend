@@ -42,6 +42,8 @@ export default function HomeIndex() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
   const [progress, setProgress] = useState(0)
+  const [imagesLoaded, setImagesLoaded] = useState(false)
+  const [loadedImages, setLoadedImages] = useState(new Set())
 
   useEffect(() => {
     const slideInterval = setInterval(() => {
@@ -81,10 +83,47 @@ export default function HomeIndex() {
     return () => clearInterval(progressInterval)
   }, [currentSlide])
 
+  // Preload images
+  useEffect(() => {
+    const preloadImages = async () => {
+      const imagePromises = heroData.map((item, index) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.onload = () => {
+            setLoadedImages(prev => new Set([...prev, index]))
+            resolve(img)
+          }
+          img.onerror = reject
+          img.src = item.image
+        })
+      })
+
+      try {
+        await Promise.all(imagePromises)
+        setImagesLoaded(true)
+      } catch (error) {
+        console.warn('Some images failed to preload:', error)
+        setImagesLoaded(true) // Still show content even if some images fail
+      }
+    }
+
+    preloadImages()
+  }, [])
+
   return (
     <>
     <Navbar />
     <div className="relative h-screen w-full overflow-hidden">
+      {/* Loading Placeholder */}
+      {!imagesLoaded && (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+          <div className="text-center text-white">
+            <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-xl font-semibold">Loading ...</p>
+          </div>
+        </div>
+      )}
+
       {/* Background Images */}
       {heroData.map((item, index) => (
         <div
@@ -96,8 +135,24 @@ export default function HomeIndex() {
           <img
             src={item.image}
             alt={item.title}
-            className="w-full h-full object-cover animate__animated animate__fadeIn"
+            className={`w-full h-full object-cover transition-opacity duration-500 ${
+              loadedImages.has(index) ? 'opacity-100' : 'opacity-0'
+            }`}
+            loading={index === 0 ? "eager" : "lazy"}
+            decoding="async"
+            style={{
+              filter: loadedImages.has(index) ? 'none' : 'blur(10px)',
+              transform: loadedImages.has(index) ? 'scale(1)' : 'scale(1.1)',
+              transition: 'all 0.6s ease-out'
+            }}
           />
+          
+          {/* Individual image loading overlay */}
+          {!loadedImages.has(index) && (
+            <div className="absolute inset-0 bg-gray-800/50 flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
+          )}
         </div>
       ))}
 
@@ -105,7 +160,9 @@ export default function HomeIndex() {
       <div className="absolute inset-0 bg-black/60"></div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-6">
+      <div className={`relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-6 transition-opacity duration-500 ${
+        imagesLoaded ? 'opacity-100' : 'opacity-0'
+      }`}>
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Title */}
           <h1 
