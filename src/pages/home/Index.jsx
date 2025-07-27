@@ -4,8 +4,8 @@ import 'animate.css'
 import Navbar from '../../components/Navbar'
 
 // Import images as modules for proper bundling
-import img1 from '/assets/DSC_3875.jpg'
-import img2 from '/assets/DSC_1869.jpg'
+import img1 from '/images/logic1.jpg'
+import img2 from '/images/DSC_7881.jpeg'
 import img3 from '/assets/DSC_4518.jpg'
 import img4 from '/assets/DSC_3738.jpg'
 import img5 from '/assets/DSC_9900.jpeg'
@@ -25,23 +25,23 @@ const heroData = [
     desc: "Come as you are and experience the transforming power of worship"
   },
   {
-    image: img3,
+    image: img1,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
 
    {
-    image: img4,
+    image: img2,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
    {
-    image: img5,
+    image: img1,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
    {
-    image: img3,
+    image: img2,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
