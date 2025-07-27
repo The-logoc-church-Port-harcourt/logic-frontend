@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Close, ExpandMore } from '@mui/icons-material';
+import logoImage from '/assets/image.webp';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -49,7 +50,7 @@ export default function Navbar() {
         {/* Logo */}
         <div className="flex-shrink-0">
           <img 
-            src="/assets/image.webp" 
+            src={logoImage} 
             alt="LOGIC Church Logo" 
             className="h-12 w-auto"
           />

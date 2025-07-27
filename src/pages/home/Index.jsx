@@ -1,49 +1,121 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { PlayArrow } from '@mui/icons-material'
 import 'animate.css'
 import Navbar from '../../components/Navbar'
 
+// Import images as modules for proper bundling
+import img1 from '/assets/DSC_3875.jpg'
+import img2 from '/assets/DSC_1869.jpg'
+import img3 from '/assets/DSC_4518.jpg'
+import img4 from '/assets/DSC_3738.jpg'
+import img5 from '/assets/DSC_9900.jpeg'
+
+// Tiny base64 placeholder for instant loading
+const placeholderImage = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNDQ0Ii8+PC9zdmc+"
+
 const heroData = [
     {
-    image: "/assets/DSC_3875.jpg",
+    image: img1,
     title: "Welcome to the LOGIC Church Port Harcourt",
     desc: "Here we preach the love of God for Us alone"
   },
   {
-    image: "/assets/DSC_1869.jpg",
+    image: img2,
      title: "Worship in Spirit and Truth",
     desc: "Come as you are and experience the transforming power of worship"
   },
   {
-    image: "/assets/DSC_4518.jpg",
+    image: img3,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
 
    {
-    image: "/assets/DSC_3738.jpg",
+    image: img4,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
    {
-    image: "/assets/DSC_9900.jpeg",
+    image: img5,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
    {
-    image: "/assets/DSC_4518.jpg",
+    image: img3,
     title: "Experience God's Love Together",
     desc: "Join our community in worship and fellowship every Sunday"
   },
   
 ]
 
+// Fast loading image component with progressive enhancement
+const FastImage = ({ src, alt, className, loading, isActive }) => {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageError, setImageError] = useState(false)
+  const [currentSrc, setCurrentSrc] = useState(placeholderImage)
+
+  useEffect(() => {
+    if (isActive || loading === "eager") {
+      // Preload the actual image
+      const img = new Image()
+      img.onload = () => {
+        setCurrentSrc(src)
+        setImageLoaded(true)
+      }
+      img.onerror = () => setImageError(true)
+      img.src = src
+    }
+  }, [src, isActive, loading])
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Always show placeholder immediately */}
+      <img
+        src={currentSrc}
+        alt={alt}
+        className={`${className} transition-all duration-500 ${
+          imageLoaded ? 'opacity-100 blur-0' : 'opacity-80 blur-sm'
+        }`}
+        style={{
+          filter: imageLoaded ? 'none' : 'blur(2px) brightness(0.8)',
+          transform: imageLoaded ? 'scale(1)' : 'scale(1.02)',
+        }}
+        loading={loading}
+        decoding="async"
+      />
+      
+      {/* Loading indicator only for non-loaded images */}
+      {!imageLoaded && !imageError && currentSrc === placeholderImage && (
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function HomeIndex() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [displayedText, setDisplayedText] = useState('')
   const [progress, setProgress] = useState(0)
-  const [imagesLoaded, setImagesLoaded] = useState(false)
-  const [loadedImages, setLoadedImages] = useState(new Set())
+
+  // Preload next and previous images for instant switching
+  useEffect(() => {
+    const preloadAdjacentImages = () => {
+      const nextIndex = (currentSlide + 1) % heroData.length
+      const prevIndex = currentSlide === 0 ? heroData.length - 1 : currentSlide - 1
+      
+      // Preload next image
+      const nextImg = new Image()
+      nextImg.src = heroData[nextIndex].image
+      
+      // Preload previous image
+      const prevImg = new Image()
+      prevImg.src = heroData[prevIndex].image
+    }
+
+    preloadAdjacentImages()
+  }, [currentSlide])
 
   useEffect(() => {
     const slideInterval = setInterval(() => {
@@ -83,86 +155,43 @@ export default function HomeIndex() {
     return () => clearInterval(progressInterval)
   }, [currentSlide])
 
-  // Preload images
-  useEffect(() => {
-    const preloadImages = async () => {
-      const imagePromises = heroData.map((item, index) => {
-        return new Promise((resolve, reject) => {
-          const img = new Image()
-          img.onload = () => {
-            setLoadedImages(prev => new Set([...prev, index]))
-            resolve(img)
-          }
-          img.onerror = reject
-          img.src = item.image
-        })
-      })
-
-      try {
-        await Promise.all(imagePromises)
-        setImagesLoaded(true)
-      } catch (error) {
-        console.warn('Some images failed to preload:', error)
-        setImagesLoaded(true) // Still show content even if some images fail
-      }
-    }
-
-    preloadImages()
-  }, [])
-
   return (
     <>
     <Navbar />
-    <div className="relative h-screen w-full overflow-hidden">
-      {/* Loading Placeholder */}
-      {!imagesLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+    <Suspense 
+      fallback={
+        <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
           <div className="text-center text-white">
-            <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-xl font-semibold">Loading ...</p>
+            <div className="w-12 h-12 border-3 border-white/40 border-t-white rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-lg font-medium">Preparing your experience...</p>
           </div>
         </div>
-      )}
-
-      {/* Background Images */}
-      {heroData.map((item, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <img
-            src={item.image}
-            alt={item.title}
-            className={`w-full h-full object-cover transition-opacity duration-500 ${
-              loadedImages.has(index) ? 'opacity-100' : 'opacity-0'
+      }
+    >
+      <div className="relative h-screen w-full overflow-hidden">
+        {/* Background Images */}
+        {heroData.map((item, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
-            loading={index === 0 ? "eager" : "lazy"}
-            decoding="async"
-            style={{
-              filter: loadedImages.has(index) ? 'none' : 'blur(10px)',
-              transform: loadedImages.has(index) ? 'scale(1)' : 'scale(1.1)',
-              transition: 'all 0.6s ease-out'
-            }}
-          />
-          
-          {/* Individual image loading overlay */}
-          {!loadedImages.has(index) && (
-            <div className="absolute inset-0 bg-gray-800/50 flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            </div>
-          )}
-        </div>
-      ))}
+          >
+            <FastImage
+              src={item.image}
+              alt={item.title}
+              className="w-full h-full object-cover"
+              loading={index === 0 ? "eager" : "lazy"}
+              isActive={index === currentSlide || Math.abs(index - currentSlide) <= 1}
+            />
+          </div>
+        ))}
 
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/60"></div>
 
-      {/* Content */}
-      <div className={`relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-6 transition-opacity duration-500 ${
-        imagesLoaded ? 'opacity-100' : 'opacity-0'
-      }`}>
+        {/* Content */}
+        <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white px-6">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Title */}
           <h1 
@@ -192,19 +221,17 @@ export default function HomeIndex() {
             </button>
           </div>
         </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
+          <div
+            className="h-full bg-gradient-red transition-all duration-100 ease-linear"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
       </div>
-
-      {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
-        <div
-          className="h-full bg-gradient-red transition-all duration-100 ease-linear"
-          style={{ width: `${progress}%` }}
-        ></div>
-      </div>
-
-
-    </div>
-
-     </>
+    </Suspense>
+    </>
   )
 }
