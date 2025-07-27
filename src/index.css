@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+html, body{
+  padding: 0;
+  margin: 0;
+}
+
+:root{
+  --primary-color: linear-gradient(135deg, #CE1F2F, #541616);
+}
+
+.bg-gradient-red {
+    background-image: linear-gradient(135deg, #CE1F2F, #541616);
+}
+
+:root {
+  --color-primary-red: #a82031; /* Used for "Home" button, "The LOGIC Church" text, and icons */
+  --color-text-dark: #333333;   /* For main headings like "Welcome to" */
+  --color-text-medium: #555555; /* For paragraph text */
+  --color-background-light: #ffffff; /* Main background color */
+  --color-border-light: #e0e0e0; /* For subtle borders/shadows, if any */
+}
+
+:root {
+  --background-color: #f9fafb ;
+}
+
+.scrollY {
+  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scroll: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-grey-400) transparent;
+  min-height: 0;
+  overflow: hidden auto;
+}
+body {
+  color: var(--color-grey-200);
+  cursor: default;
+  background: black;
+}
+body {
+  transition: opacity ease-in 0.2s;
+}
+
+body {
+  box-sizing: border-box;
+  line-height: 1;
+}
+html, body {
+  touch-action: manipulation;
+  -ms-touch-action: manipulation;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-size: 16px;
+}
+.scrollY {
+  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scroll: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-grey-400) transparent;
+  min-height: 0;
+  overflow: hidden auto;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+button{
+  cursor: pointer;
+}
