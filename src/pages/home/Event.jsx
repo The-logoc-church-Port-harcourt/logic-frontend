@@ -26,14 +26,14 @@ const getNextThursday = () => {
 
 const eventsData = [
   {
-    image: "/images/10363611.jpg",
+    image: "/assets/10363611.jpg",
     title: "Midweek Koinonia",
     date: getNextThursday(),
     time: "6:00 PM",
     venue: "Logic Church Port Harcourt Center"
   },
   {
-    image: "/images/Yes-Indeed-Screen.JPEG.jpg",
+    image: "/assets/Yes-Indeed-Screen.JPEG.jpg",
     title: "Sunday Worship Service",
     date: "Every Sunday",
     time: "9:00 AM",

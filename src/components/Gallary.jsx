@@ -49,11 +49,22 @@ const customStyles = `
 `
 
 // Import gallery images
-import img1 from '/images/logic1.jpg'
-import img2 from '/images/DSC_7881.jpeg'
-import img3 from '/images/DSC_1730.jpg'
-import img4 from '/images/DSC_1785.jpg'
-import img5 from '/images/DSC_1869.jpg'
+import img1 from '/assets/DSC_1709.jpg'
+import img2 from '/assets/DSC_1730.jpg'
+import img3 from '/assets/DSC_1869.jpg'
+import img4 from '/assets/DSC_1975.jpg'
+import img5 from '/assets/DSC_2015.jpg'
+import img6 from '/assets/DSC_3706.jpg'
+import img7 from '/assets/DSC_3716.jpg'
+
+import img8 from '/assets/DSC_3718-2.jpg'
+import img9 from '/assets/DSC_6208.jpg'
+import img10 from '/assets/DSC_7916.jpeg'
+import img11 from '/assets/DSC_7966.jpeg'
+import img12 from '/assets/DSC_7975.jpeg'
+import img13 from '/assets/DSC_9889.jpeg'
+import img14 from '/assets/DSC_9940.jpeg'
+
 
 const galleryImages = [
   { src: img1, alt: "Church gathering moment 1" },
@@ -61,18 +72,16 @@ const galleryImages = [
   { src: img3, alt: "Community fellowship" },
   { src: img4, alt: "Church gathering moment 2" },
   { src: img5, alt: "Special church event" },
-  { src: img1, alt: "Church gathering moment 3" },
-  { src: img2, alt: "Prayer session" },
-  { src: img3, alt: "Youth ministry" },
-    { src: img1, alt: "Church gathering moment 3" },
-  { src: img2, alt: "Prayer session" },
-  { src: img3, alt: "Youth ministry" },
-      { src: img1, alt: "Church gathering moment 3" },
-  { src: img2, alt: "Prayer session" },
-  { src: img3, alt: "Youth ministry" },
-    { src: img3, alt: "Youth ministry" },
-    { src: img1, alt: "Church gathering moment 3" },
-  { src: img2, alt: "Prayer session" },
+  { src: img6, alt: "Church gathering moment 3" },
+  { src: img7, alt: "Prayer session" },
+  { src: img8, alt: "Youth ministry" },
+    { src: img9, alt: "Church gathering moment 3" },
+  { src: img10, alt: "Prayer session" },
+  { src: img11, alt: "Youth ministry" },
+    { src: img12, alt: "Church gathering moment 3" },
+  { src: img13, alt: "Prayer session" },
+  { src: img14, alt: "Youth ministry" },
+
 ]
 
 export default function Gallary() {
