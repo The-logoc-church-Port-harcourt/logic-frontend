@@ -2,22 +2,9 @@ import React, { createContext, useState, useContext, useEffect, useCallback } fr
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { setCookie, getCookie, removeCookie } from '../api/cookies';
-import * as authService from '../api/auth';
 
 const AuthContext = createContext(null);
 
-// Create a custom hook that can be used by components that have access to router context
-const useAuthNavigation = () => {
-  const navigate = useNavigate();
-  const { logout: contextLogout } = useAuth();
-  
-  const logout = useCallback(() => {
-    contextLogout();
-    navigate('/admin/login');
-  }, [navigate, contextLogout]);
-  
-  return { logout };
-};
 
 export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
@@ -135,6 +122,5 @@ export const useAuth = () => {
   return context;
 };
 
-export { useAuthNavigation };
 
 export default AuthContext;

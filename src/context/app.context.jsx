@@ -1,7 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import ApiService from '../api/api';
-
 
 // Create context
 const AppContext = createContext();

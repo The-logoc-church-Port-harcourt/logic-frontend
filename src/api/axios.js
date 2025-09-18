@@ -3,8 +3,8 @@ import { getCookie } from './cookies';
 import { toast } from 'sonner';
 
 export const backendUrl = () => {
-  let localhostUrl = "http://localhost:8000";
-  let remoteUrl = "https://safex-42ce38fb7bd7.herokuapp.com";
+  let localhostUrl = "http://localhost:8000/logic";
+  let remoteUrl = "https://love-meet.onrender.com/logic";
   
   // Check if window is defined (client-side) before accessing location
   const isLocalhost = typeof window !== 'undefined' && 

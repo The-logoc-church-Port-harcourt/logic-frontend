@@ -30,8 +30,7 @@ const location = useLocation();
 };
   
   const currentRoute = getCurrentRoute();
-  console.log(currentRoute);
-  
+
   const showNavigation = currentRoute?.showInNav
 
   return (
