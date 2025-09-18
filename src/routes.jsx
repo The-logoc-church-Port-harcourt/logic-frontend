@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute';
-import Preloader from "./components/Proloader"
+import ProtectedRoute from './middleware/Protectedroute';
 
 // Public components
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -16,112 +15,79 @@ const AdminManagement = lazy(() => import('./pages/admin/AdminManagement'));
 const EventSetting = lazy(() => import('./pages/admin/EventSetting'));
 const Gallery = lazy(() => import('./pages/admin/Gallery'));
 
-
-
-// Admin Layout Wrapper
-const AdminRoute = () => (
-  <ProtectedRoute adminOnly={true}>
-    <AdminLayout>
-      <Suspense fallback={<Preloader />}>
-        <Outlet />
-      </Suspense>
-    </AdminLayout>
-  </ProtectedRoute>
-);
-
-// Public Layout Wrapper
-const PublicLayout = ({ children }) => (
-  <>
-    <Suspense fallback={<Preloader />}>
-      {children}
-    </Suspense>
-  </>
-);
-
 export const routes = [
   // Public routes
   {
     path: '/',
-    element: <PublicLayout><HomeIndex /></PublicLayout>,
+    element: <HomeIndex />,
     name: 'Home',
     showInNav: true,
+    showInFooter: true,
   },
   {
     path: '/events',
-    element: <PublicLayout><EventsHome /></PublicLayout>,
+    element: <EventsHome />,
     name: 'Events',
     showInNav: true,
+    showInFooter: true,
   },
-  // Redirect old login URL to new admin login
+   {
+    path: '/admin',
+    element:  <Navigate to="/admin/dashboard" replace />,
+    name: 'Admin',
+    showInNav: false,
+    showInFooter: false,
+  },
+  {
+    path: '/admin/dashboard',
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute> ,
+    name: 'Dashboard',
+    showInNav: true,
+    showInFooter: false,
+    isAdmin: true
+  },
   {
     path: '/login',
-    element: <Navigate to="/admin/login" replace />,
+    element: <Navigate to="/" replace />,
     name: 'Login Redirect',
     showInNav: false,
+    showInFooter: false,
   },
-  
-  // Admin routes
   {
-    path: '/admin',
-    children: [
-      // Login route - public
-      {
-        path: 'login',
-        element: <Login />,
-        name: 'Login',
-        showInNav: false,
-      },
-      // All other admin routes - protected
-      {
-        path: '*',
-        element: <AdminRoute />,
-        children: [
-          // Redirect /admin to /admin/dashboard
-          {
-            path: '',
-            element: <Navigate to="dashboard" replace />,
-          },
-          // Dashboard
-          {
-            path: 'dashboard',
-            element: <Dashboard />,
-            name: 'Dashboard',
-            showInNav: true,
-            icon: 'dashboard',
-          },
-          // Admin Management
-          {
-            path: 'admins',
-            element: <AdminManagement />,
-            name: 'Admins',
-            showInNav: true,
-            icon: 'users',
-            adminOnly: true,
-          },
-          // Events Management
-          {
-            path: 'events',
-            element: <EventSetting />,
-            name: 'Events',
-            showInNav: true,
-            icon: 'calendar',
-          },
-          // Gallery Management
-          {
-            path: 'gallery',
-            element: <Gallery />,
-            name: 'Gallery',
-            showInNav: true,
-            icon: 'image',
-          },
-        ],
-      },
-    ],
+    path: '/admin/login',
+    element:  <Login />,
+    name: 'Login ',
+    showInNav: false,
+    showInFooter: false,
+    isAdmin: true
   },
-  // 404 - Not Found (must be last)
+  {
+    path: '/admin/admins',
+    element: <ProtectedRoute><AdminManagement /></ProtectedRoute> ,
+    name: 'Admins ',
+    showInNav: true,
+    showInFooter: false,
+    isAdmin: true
+  },
+  {
+    path: '/admin/events',
+    element: <EventSetting />,
+    name: 'Events',
+    showInNav: true,
+    showInFooter: false,
+    isAdmin: true
+  },
+  {
+    path: '/admin/gallery',
+    element: <Gallery />,
+    name: 'Gallery',
+    showInNav: true,
+    showInFooter: false,
+    isAdmin: true
+  },
   {
     path: '*',
-    element: <PublicLayout><NotFound /></PublicLayout>,
+    element: <NotFound />,
     name: 'Not Found',
     showInNav: false,
   },

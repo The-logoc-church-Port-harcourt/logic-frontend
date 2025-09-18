@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { useAuth, useAuthNavigation } from '../context/AdminAuthContext';
+import { useAuth } from '../context/AdminAuthContext';
 import { LogOut, User, Menu, X, Image as ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
 // Temporary logo
 const logoImage = '/assets/image.webp';
 
 const AdminNavbar = ({ onMenuToggle, isSidebarOpen }) => {
-  const { admin: user, logout } = useAuth();
-  const { logout: navigateOnLogout } = useAuthNavigation();
+  const { admin: user, logout , logout: navigateOnLogout } = useAuth();
   const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const handleLogout = async () => {
