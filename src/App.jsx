@@ -1,86 +1,61 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import 'animate.css';
 import { Toaster } from 'sonner';
-import { AuthProvider, useAuth } from './context/AdminAuthContext';
 import { routes } from './routes';
+import Proloader from './components/Proloader';
 
-// Loading component for Suspense
-const Loading = () => (
-  <div className="flex items-center justify-center min-h-screen bg-gray-900">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-  </div>
-);
+// Lazy load Layout component
+const Layout = lazy(() => import('./layouts/Layout'));
 
-// Wrapper component to handle auth redirects
-const AuthWrapper = ({ children }) => {
-  const { admin: user, loading } = useAuth();
-  const location = useLocation();
 
-  // Don't render anything until initial auth check is complete
-  if (loading) {
-    return <Loading />;
-  }
-
-  // Only run the auth checks after initial load
-  if (loading === false) {
-    // If user is not authenticated and trying to access protected routes
-    if (!user && location.pathname.startsWith('/admin') && !location.pathname.endsWith('/login')) {
-      return <Navigate to="/admin/login" state={{ from: location }} replace />;
-    }
-
-    // If user is authenticated and on login page, redirect to dashboard
-    if (user && location.pathname === '/admin/login') {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
-  }
-
-  return children;
-};
-
-// Recursive function to render routes and their children
-const renderRoutes = (routes) => {
+function createRouteConfig(routes) {
   return routes.map((route) => {
-    if (route.children) {
-      return (
-        <Route 
-          key={route.path} 
-          path={route.path} 
-          element={route.element}
-        >
-          {renderRoutes(route.children)}
-        </Route>
-      );
+    const routeConfig = {
+      path: route.path,
+      element: (
+        <Suspense fallback={<Proloader />}>
+          {route.element}
+        </Suspense>
+      ),
+    };
+
+    if (route.index) {
+      routeConfig.index = route.index;
     }
-    return (
-      <Route
-        key={route.path}
-        path={route.path}
-        element={route.element}
-      />
-    );
+
+    if (route.children && route.children.length > 0) {
+      routeConfig.children = createRouteConfig(route.children);
+    }
+
+    return routeConfig;
   });
-};
+}
+
+// Create the router with nested route support
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: (
+      <Suspense fallback={<Proloader />}>
+        <Layout />
+      </Suspense>
+    ),
+    children: createRouteConfig(routes)
+  }
+]);
 
 function App() {
+  // useEffect(() => {
+  //   initializePreloading();
+  // }, []);
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <Toaster richColors position="bottom-right" />
-      <AuthProvider>
-        <Router>
-          <AuthWrapper>
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              {renderRoutes(routes)}
-              {/* Redirect any unknown routes to home */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-          </AuthWrapper>
-        </Router>
-      </AuthProvider>
-    </div>
-  );
+    <Suspense fallback={<Proloader />}>
+      <Toaster richColors position='bottom-left'/>
+      <RouterProvider router={router} />
+    </Suspense>
+  ) 
 }
 
 export default App;

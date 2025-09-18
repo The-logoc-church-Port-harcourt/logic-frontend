@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import Preloader from "./components/Proloader"
 
 // Public components
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -15,18 +16,13 @@ const AdminManagement = lazy(() => import('./pages/admin/AdminManagement'));
 const EventSetting = lazy(() => import('./pages/admin/EventSetting'));
 const Gallery = lazy(() => import('./pages/admin/Gallery'));
 
-// Loading component
-const Loading = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-900">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-  </div>
-);
+
 
 // Admin Layout Wrapper
 const AdminRoute = () => (
   <ProtectedRoute adminOnly={true}>
     <AdminLayout>
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<Preloader />}>
         <Outlet />
       </Suspense>
     </AdminLayout>
@@ -36,7 +32,7 @@ const AdminRoute = () => (
 // Public Layout Wrapper
 const PublicLayout = ({ children }) => (
   <>
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<Preloader />}>
       {children}
     </Suspense>
   </>
