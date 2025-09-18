@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Menu, Close, ExpandMore } from '@mui/icons-material';
 import logoImage from '/assets/image.webp';
 
@@ -78,21 +79,21 @@ export default function Navbar() {
                   {isTrainingDropdownOpen && (
                     <div className="absolute top-full left-0 mt-2 w-60 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg shadow-lg">
                       {link.dropdown.map((item, index) => (
-                        <a
+                        <NavLink
                           key={index}
-                          href="#"
+                          to="#"
                           className="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
                           onClick={() => handleLinkClick(item)}
                         >
                           {item}
-                        </a>
+                        </NavLink>
                       ))}
                     </div>
                   )}
                 </div>
               ) : (
-                <a
-                  href={link.href}
+                <NavLink
+                  to={link.href}
                   onClick={() => handleLinkClick(link.name)}
                   className={`relative px-4 py-2 font-medium transition-all duration-300 hover:scale-105 ${
                     isScrolled ? 'text-white' : 'text-white'
@@ -102,7 +103,7 @@ export default function Navbar() {
                   <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-red transition-all duration-300 ${
                     activeLink === link.name ? 'w-full' : 'w-0'
                   }`}></span>
-                </a>
+                </NavLink>
               )}
             </div>
           ))}
