@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, Close, ExpandMore } from '@mui/icons-material';
 import logoImage from '/assets/image.webp';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isTrainingDropdownOpen, setIsTrainingDropdownOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState('Home');
+  const [activeLink, setActiveLink] = useState(
+    window.location.pathname.startsWith('/trainings') ? 'Training' : 'Home'
+  );
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -15,8 +19,11 @@ export default function Navbar() {
     { name: 'Event', href: '/events' },
     { 
       name: 'Training', 
-      href: '/training',
-      dropdown: ['LOGIC Foundation class', 'LOGIC Discipleship class', ]
+      href: '/trainings',
+      dropdown: [
+        { name: 'LOGIC Foundation class', href: '/trainings/lfc' },
+        { name: 'LOGIC Discipleship class', href: '/trainings/ldc' },
+      ]
     }
   ];
 
@@ -32,6 +39,19 @@ export default function Navbar() {
     setActiveLink(linkName);
     setIsMobileMenuOpen(false);
   };
+
+  // Set active link based on current path
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.startsWith('/trainings')) {
+      setActiveLink('Training');
+    } else {
+      const currentLink = navLinks.find(link => link.href === path);
+      if (currentLink) {
+        setActiveLink(currentLink.name);
+      }
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,11 +80,17 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center space-x-8">
           {navLinks.map((link) => (
-            <div key={link.name} className="relative">
+            <div
+              key={link.name}
+              className="relative"
+              onMouseEnter={() => link.dropdown && setIsTrainingDropdownOpen(true)}
+              onMouseLeave={() => link.dropdown && setIsTrainingDropdownOpen(false)}
+              data-active={activeLink === link.name || (link.name === 'Training' && window.location.pathname.startsWith('/trainings'))}
+            >
               {link.dropdown ? (
                 <div className="relative">
                   <button
-                    onClick={toggleTrainingDropdown}
+                    onClick={() => { handleLinkClick(link.name); navigate(link.href); }}
                     className={`relative flex items-center gap-1 px-4 py-2 font-medium transition-all duration-300 hover:scale-105 ${
                       isScrolled ? 'text-white' : 'text-white'
                     }`}
@@ -72,20 +98,23 @@ export default function Navbar() {
                     {link.name}
                     <ExpandMore className="text-sm" />
                     <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-red transition-all duration-300 ${
-                      activeLink === link.name ? 'w-full' : 'w-0'
+                      activeLink === link.name || (link.name === 'Training' && window.location.pathname.startsWith('/trainings')) ? 'w-full' : 'w-0'
                     }`}></span>
                   </button>
-                  
                   {isTrainingDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-60 backdrop-blur-sm bg-white/10 border border-white/20 rounded-lg shadow-lg">
-                      {link.dropdown.map((item, index) => (
+                    <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                      {link.dropdown.map((item) => (
                         <NavLink
-                          key={index}
-                          to="#"
-                          className="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
-                          onClick={() => handleLinkClick(item)}
+                          key={item.name}
+                          to={item.href}
+                          className={({ isActive }) =>
+                            `block px-4 py-3 text-sm transition-colors duration-200 ${
+                              isActive ? 'bg-gray-100 text-gray-900 font-semibold' : 'text-gray-700 hover:bg-gray-50'
+                            }`
+                          }
+                          onClick={() => handleLinkClick(item.name)}
                         >
-                          {item}
+                          {item.name}
                         </NavLink>
                       ))}
                     </div>
@@ -109,9 +138,12 @@ export default function Navbar() {
           ))}
           
           {/* Join Our Forum Button */}
-          <button className="bg-gradient-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+          <NavLink 
+            to="/forum/signup" 
+            className="bg-gradient-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
             Join Our Forum
-          </button>
+          </NavLink>
         </div>
 
         {/* Mobile Menu Button */}
@@ -139,7 +171,7 @@ export default function Navbar() {
                       <button
                         onClick={toggleTrainingDropdown}
                         className={`flex items-center justify-between w-full px-4 py-3 rounded-lg text-white font-medium transition-all duration-300 ${
-                          activeLink === link.name 
+                          activeLink === link.name || (link.name === 'Training' && location.pathname.startsWith('/trainings'))
                             ? 'border border-red-500 backdrop-blur-sm bg-white/10' 
                             : 'hover:backdrop-blur-sm hover:bg-white/10'
                         }`}
@@ -150,22 +182,26 @@ export default function Navbar() {
                       
                       {isTrainingDropdownOpen && (
                         <div className="mt-2 ml-4 space-y-2">
-                          {link.dropdown.map((item, index) => (
-                            <a
-                              key={index}
-                              href="#"
-                              className="block px-4 py-2 text-white hover:bg-white/10 rounded-lg transition-colors duration-200"
-                              onClick={() => handleLinkClick(item)}
+                          {link.dropdown.map((item) => (
+                            <NavLink
+                              key={item.name}
+                              to={item.href}
+                              className={({ isActive }) =>
+                                `block px-4 py-2 rounded-lg transition-colors duration-200 ${
+                                  isActive ? 'bg-white/20 text-white font-semibold' : 'text-white hover:bg-white/10'
+                                }`
+                              }
+                              onClick={() => handleLinkClick(item.name)}
                             >
-                              {item}
-                            </a>
+                              {item.name}
+                            </NavLink>
                           ))}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <a
-                      href={link.href}
+                    <NavLink
+                      to={link.href}
                       onClick={() => handleLinkClick(link.name)}
                       className={`block px-4 py-3 rounded-lg text-white font-medium transition-all duration-300 ${
                         activeLink === link.name 
@@ -174,15 +210,19 @@ export default function Navbar() {
                       }`}
                     >
                       {link.name}
-                    </a>
+                    </NavLink>
                   )}
                 </div>
               ))}
               
               {/* Mobile Join Our Forum Button */}
-              <button className="w-full bg-gradient-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg mt-4">
+              <NavLink 
+                to="/forum/signup" 
+                className="block w-full text-center bg-gradient-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg mt-4"
+                onClick={() => handleLinkClick('Forum')}
+              >
                 Join Our Forum
-              </button>
+              </NavLink>
             </div>
           </div>
         </div>

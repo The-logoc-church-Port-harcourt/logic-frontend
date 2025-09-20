@@ -11,12 +11,12 @@ export const backendUrl = () => {
     (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
   
   const _api = isLocalhost ? localhostUrl : remoteUrl;
-  return _api;
+  return remoteUrl;
 };
 
 const api = axios.create({
   baseURL: backendUrl(),
-  timeout: 10000,
+  timeout: 30000, // Increased to 30 seconds
   headers: {
     'Content-Type': 'application/json',
   }
