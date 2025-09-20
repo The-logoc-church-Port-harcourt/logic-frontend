@@ -8,7 +8,6 @@ const HomeIndex = lazy(() => import('./pages/home/Index'));
 const EventsHome = lazy(() => import('./pages/home/Event'));
 const Login = lazy(() => import('./pages/auth/Login'));
 
-// Admin components
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminManagement = lazy(() => import('./pages/admin/AdminManagement'));
@@ -16,7 +15,6 @@ const EventSetting = lazy(() => import('./pages/admin/EventSetting'));
 const Gallery = lazy(() => import('./pages/admin/Gallery'));
 
 export const routes = [
-  // Public routes
   {
     path: '/',
     element: <HomeIndex />,

@@ -20,7 +20,7 @@ const welcomeData = [
     borderGradient: "from-blue-500/30 to-cyan-500/30"
   },
   {
-    title: "Impart",
+    title: "Impact",
     desc: "What we do — transforming lives and communities by the Spirit.",
     icon: <Public className="text-6xl" />,
     gradient: "from-purple-500 to-indigo-500",
