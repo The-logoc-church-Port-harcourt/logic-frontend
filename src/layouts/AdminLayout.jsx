@@ -2,9 +2,19 @@ import { Outlet } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
 import Sidebar from '../components/Sidebar';
 import { useState } from 'react';
+import { useAuth } from '../context/AdminAuthContext';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    try {
+      logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
@@ -12,6 +22,7 @@ const AdminLayout = () => {
         <AdminNavbar 
           onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} 
           isSidebarOpen={isSidebarOpen} 
+          onLogout={handleLogout}
         />
       </header>
       

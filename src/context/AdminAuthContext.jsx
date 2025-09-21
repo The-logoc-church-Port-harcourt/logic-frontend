@@ -2,9 +2,9 @@ import React, { createContext, useState, useContext, useEffect, useCallback } fr
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { setCookie, getCookie, removeCookie } from '../api/cookies';
+import { authService } from '../api/authService';
 
 const AuthContext = createContext(null);
-
 
 export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
@@ -12,70 +12,68 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const checkAuth = useCallback(async () => {
-    let isMounted = true;
-    
-    try {
-      const token = getCookie('token');
-      if (token) {
-        const userData = await authService.getCurrentUser();
-        if (isMounted) {
-          setAdmin(userData.admin || userData.Admin);
-        }
-      } else {
-        // If no token, make sure admin is set to null
-        if (isMounted) {
-          setAdmin(null);
-        }
-      }
-    } catch (err) {
-      console.error('Auth check failed:', err);
-      if (isMounted) {
-        setError(err.response?.data?.message || 'Authentication failed');
-        setAdmin(null); // Clear admin on error
-      }
-    } finally {
-      if (isMounted) {
-        setLoading(false);
-      }
+    const token = getCookie('token');
+      console.log(token)
+    if (!token) {
+      setAdmin(null);
+      setLoading(false);
+      return;
     }
 
-    return () => {
-      isMounted = false;
-    };
+    try {
+      // Verify token with backend
+      const response = await authService.getCurrentUser();
+      const adminData = response?.admin || response?.data?.admin || null;
+      console.log(response)
+      if (adminData) {
+        setAdmin(adminData);
+      } else {
+        // Invalid token, remove it
+        removeCookie('token');
+        setAdmin(null);
+      }
+    } catch (err) {
+      console.error('Auth check error:', err);
+      // Token is invalid, remove it
+      removeCookie('token');
+      setAdmin(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     checkAuth();
-    // We can safely ignore the warning about checkAuth being a dependency
-    // because it's wrapped in useCallback with no dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [checkAuth]);
 
   const login = async (email, password) => {
+    setLoading(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
       const response = await authService.login(email, password);
-      const { token, admin } = response;
-      
-      // Set token in cookies
-      setCookie('token', token, { 
-        expires: 7, // 7 days
-        secure: window.location.protocol === 'https:',
-        sameSite: 'strict'
+      const token = response?.token ?? response?.data?.token ?? response?.accessToken ?? response?.data?.accessToken;
+      const adminData = response?.admin ?? response?.data?.admin ?? null;
+
+      if (!token) {
+        throw new Error('Login response missing token');
+      }
+
+      setCookie('token', token, {
+        expires: 7,
+        sameSite: 'Strict',
+        secure: typeof window !== 'undefined' && window.location.protocol === 'https:'
       });
-      
-      setAdmin(admin);
-      toast.success('Login successful');
+      setAdmin(adminData || { id: 'dev', name: 'Admin', role: 'admin' });
+      toast.success('Login successful!');
+      setLoading(false);
       return true;
     } catch (err) {
-      console.error('Login failed:', err);
-      const errorMsg = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      const errorMsg = err.response?.data?.error || 'Login failed. Please try again.';
       setError(errorMsg);
       toast.error(errorMsg);
-      return false;
-    } finally {
       setLoading(false);
+      throw new Error(errorMsg);
     }
   };
 
@@ -85,13 +83,13 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      // Clear all authentication state
       removeCookie('token');
       setAdmin(null);
       setError(null);
       setLoading(false);
     }
   }, []);
+
 
   const isAuthenticated = useCallback(() => {
     return !!admin;
@@ -121,6 +119,5 @@ export const useAuth = () => {
   }
   return context;
 };
-
 
 export default AuthContext;

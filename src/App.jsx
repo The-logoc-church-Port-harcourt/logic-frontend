@@ -1,13 +1,13 @@
 import { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { routes } from './routes';
 import 'animate.css';
 import { Toaster } from 'sonner';
-import { routes } from './routes';
 import Proloader from './components/Proloader';
+// import { initializePreloading } from './utils/preloader';
 
 // Lazy load Layout component
 const Layout = lazy(() => import('./layouts/Layout'));
-
 
 function createRouteConfig(routes) {
   return routes.map((route) => {
@@ -58,4 +58,5 @@ function App() {
   ) 
 }
 
-export default App;
+export default App
+

@@ -6,7 +6,8 @@ import {
   LayoutDashboard, 
   Users, 
   Calendar, 
-  Image as ImageIcon, 
+  Image as ImageIcon,
+  MessageSquare,
   LogOut 
 } from 'lucide-react';
 
@@ -33,6 +34,12 @@ const Sidebar = () => {
       path: '/admin/gallery', 
       icon: <ImageIcon size={18} />,
       adminOnly: false
+    },
+    { 
+      name: 'Posts', 
+      path: '/admin/posts', 
+      icon: <MessageSquare size={18} />,
+      adminOnly: true
     },
     { 
       name: 'Admins', 

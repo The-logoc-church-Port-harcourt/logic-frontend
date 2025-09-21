@@ -1,76 +1,86 @@
-import React, { useEffect } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AdminAuthContext';
+import React, { useEffect, useState, createContext } from 'react';
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
-const ProtectedRoute = ({ 
-  children, 
-  adminOnly = false,
-  requiredRoles = ['admin', 'superadmin'] // Default required roles for admin routes
-}) => {
-  const { admin: user, loading, isAuthenticated } = useAuth();
+// Hardcoded admin credentials (for demo purposes only)
+const ADMIN_CREDENTIALS = {
+  email: 'admin@logic.church',
+  password: 'admin123'
+};
+
+// Create auth context
+export const AuthContext = createContext({
+  isAuthenticated: false,
+  logout: () => {}
+});
+
+const ProtectedRoute = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Handle authentication state changes
+  // Check authentication status on mount
   useEffect(() => {
-    // If not loading and not authenticated, redirect to login
-    if (!loading && !isAuthenticated() && location.pathname !== '/login') {
-      navigate('/login', { 
-        state: { from: location },
-        replace: true 
-      });
+    const checkAuth = () => {
+      try {
+        // Check if user is authenticated in session storage
+        const storedAuth = sessionStorage.getItem('adminAuth');
+        if (storedAuth) {
+          const { email, password } = JSON.parse(storedAuth);
+          if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Handle login
+  const handleLogin = (email, password) => {
+    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+      sessionStorage.setItem('adminAuth', JSON.stringify({ email, password }));
+      setIsAuthenticated(true);
+      return { success: true };
     }
-  }, [loading, isAuthenticated, location, navigate]);
+    return { success: false, error: 'Invalid email or password' };
+  };
 
-  // Show loading spinner while checking auth state
-  if (loading || (user === null && isAuthenticated())) {
+  // Handle logout
+  const handleLogout = () => {
+    sessionStorage.removeItem('adminAuth');
+    setIsAuthenticated(false);
+  };
+
+  // Show loading state while checking auth
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-red-500" />
-          <p className="text-gray-400">Verifying your session...</p>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="animate-spin h-12 w-12 text-red-600 mb-4" />
+          <p className="text-gray-400">Verifying authentication...</p>
         </div>
       </div>
     );
   }
 
-  // If not authenticated, redirect to login
-  if (!isAuthenticated()) {
-    return (
-      <Navigate 
-        to="/login" 
-        state={{ 
-          from: location,
-          message: 'Please sign in to access this page.'
-        }} 
-        replace 
-      />
-    );
+  // If not authenticated, redirect to login with return location
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // Check if admin access is required and user has the required role
-  if (adminOnly && user && !requiredRoles.includes(user.role)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
-        <div className="max-w-md w-full bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-          <h2 className="text-2xl font-bold text-red-500 mb-4">Access Denied</h2>
-          <p className="text-gray-300 mb-6">
-            You don't have permission to access this page. Please contact an administrator if you believe this is an error.
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // If authenticated and authorized, render the children
-  return children;
+  // If authenticated, render the child routes with auth context
+  return (
+    <AuthContext.Provider value={{ isAuthenticated: true, logout: handleLogout }}>
+      <Outlet context={{ login: handleLogin }} />
+    </AuthContext.Provider>
+  );
 };
 
 export default ProtectedRoute;

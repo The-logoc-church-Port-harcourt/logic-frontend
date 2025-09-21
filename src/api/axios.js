@@ -11,12 +11,12 @@ export const backendUrl = () => {
     (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
   
   const _api = isLocalhost ? localhostUrl : remoteUrl;
-  return _api;
+  return remoteUrl;
 };
 
 const api = axios.create({
   baseURL: backendUrl(),
-  timeout: 10000,
+  timeout: 30000, // Increased to 30 seconds
   headers: {
     'Content-Type': 'application/json',
   }
@@ -43,13 +43,13 @@ api.interceptors.response.use(
   (error) => {
     if (error.response) {
       console.error('API Error:', error.response.data);
-      toast.error(error.response.data?.error);
+      // toast.error(error.response.data?.error);
     } else if (error.request) {
       console.error('Network Error:', error.request);
-      toast.error("Network Error");
+      // toast.error("Network Error");
     } else {
       console.error('Error:', error.message);
-      toast.error(error.message);
+      // toast.error(error.message);
     }
     return Promise.reject(error);
   }
