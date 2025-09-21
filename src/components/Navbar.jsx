@@ -139,7 +139,7 @@ export default function Navbar() {
           
           {/* Join Our Forum Button */}
           <NavLink 
-            to="/forum/signup" 
+            to="/forum" 
             className="bg-gradient-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             Join Conversation
@@ -215,13 +215,13 @@ export default function Navbar() {
                 </div>
               ))}
               
-              {/* Mobile Join Our Forum Button */}
+
               <NavLink 
-                to="/forum/signup" 
+                to="/forum" 
                 className="block w-full text-center bg-gradient-red text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg mt-4"
                 onClick={() => handleLinkClick('Forum')}
               >
-                Join Our Forum
+                       Join Conversation
               </NavLink>
             </div>
           </div>

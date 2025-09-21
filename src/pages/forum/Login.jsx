@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Close } from '@mui/icons-material';
+import api from "../../api/axios"
+import { getCookie } from '../../api/cookies';
+import { useAuth } from '../../context/AdminAuthContext';
 
 const Login = () => {
+  const [loading, setLoading] = useState(false)
+  const { setUser } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,15 +26,18 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+    setLoading(true)
     try {
-      // TODO: Add your actual authentication logic here
-      // For now, we'll simulate a successful login
-      const user = { email: formData.email };
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      const response = await api.post('/user/login', formData);
+      const { user, token } = response.data;
+      getCookie(token)
+      setUser(user)
       navigate('/forum');
     } catch (err) {
-      setError(err.message || 'Failed to log in');
+      setError(err.response.data?.message || 'Failed to log in');
+    }
+    finally{
+      setLoading(false)
     }
   };
 
@@ -78,9 +86,9 @@ const Login = () => {
               <label htmlFor="password" className="block text-sm font-medium text-gray-300">
                 Password
               </label>
-              <Link to="/forgot-password" className="text-xs text-red-400 hover:text-red-300">
+              {/* <Link to="/forgot-password" className="text-xs text-red-400 hover:text-red-300">
                 Forgot password?
-              </Link>
+              </Link> */}
             </div>
             <input
               type="password"
@@ -95,10 +103,11 @@ const Login = () => {
           </div>
 
           <button
+          disabled={loading}
             type="submit"
             className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg font-semibold hover:opacity-90 transition-opacity"
           >
-            Log In
+           {loading ? "Loading..." :  "Log In"}
           </button>
 
           <div className="text-center text-sm text-gray-400 mt-4">

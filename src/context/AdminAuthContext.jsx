@@ -3,48 +3,81 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { setCookie, getCookie, removeCookie } from '../api/cookies';
 import { authService } from '../api/authService';
+import api from "../api/axios"
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
+  const [ user, setUser] = useState(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  const checkAuth = useCallback(async () => {
+  const fetchUser = (async()=>{
     const token = getCookie('token');
-      console.log(token)
-    if (!token) {
-      setAdmin(null);
-      setLoading(false);
-      return;
+    if(!token){
+       setLoading(false)
+      return null
     }
-
-    try {
-      // Verify token with backend
-      const response = await authService.getCurrentUser();
-      const adminData = response?.admin || response?.data?.admin || null;
-      console.log(response)
-      if (adminData) {
-        setAdmin(adminData);
-      } else {
-        // Invalid token, remove it
-        removeCookie('token');
-        setAdmin(null);
-      }
-    } catch (err) {
-      console.error('Auth check error:', err);
-      // Token is invalid, remove it
-      removeCookie('token');
-      setAdmin(null);
-    } finally {
-      setLoading(false);
+    setLoading(true)
+    try{
+        const userProfile = await api.get('/user/profile');
+        setUser(userProfile.data.user);
     }
-  }, []);
+    catch(err){
+      console.log(err)
+      return null
+    }
+    finally{
+      setLoading(false)
+    }
+  })
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  useEffect(()=>{
+    fetchUser()
+  }, [])
+
+  // const checkAuth = useCallback(async () => {
+  //   const token = getCookie('token');
+  //     console.log(token)
+  //   if (!token) {
+  //     setAdmin(null);
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     // Verify token with backend
+  //     const response = await authService.getCurrentUser();
+  //     const adminData = response?.admin || response?.data?.admin || null;
+  //     console.log(response)
+  //     if(response){
+  //       setIsAuthenticated(true)
+  //     }
+  //     if (adminData) {
+  //       setAdmin(adminData);
+  //     } else {
+  //       // Invalid token, remove it
+  //       removeCookie('token');
+  //       setAdmin(null);
+  //     }
+  //   } catch (err) {
+  //     console.error('Auth check error:', err);
+  //     // Token is invalid, remove it
+  //     removeCookie('token');
+  //     setAdmin(null);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, []);
+
+
+
+
+  // useEffect(() => {
+  //   checkAuth();
+  // }, [checkAuth]);
 
   const login = async (email, password) => {
     setLoading(true);
@@ -91,9 +124,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  const isAuthenticated = useCallback(() => {
-    return !!admin;
-  }, [admin]);
 
   const value = {
     admin,
@@ -102,7 +132,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     isAuthenticated,
-    setAdmin
+    setAdmin,
+    user, setUser
   };
 
   return (

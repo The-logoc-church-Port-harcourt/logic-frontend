@@ -3,8 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Close } from '@mui/icons-material';
 import api from '../../api/axios';
 import { setCookie } from '../../api/cookies';
+import { useAuth } from '../../context/AdminAuthContext';
 
 export default function SignUp() {
+  const { setUser } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -60,22 +62,17 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = validateForm();
-    
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       try {
         const response = await api.post('/user/register', formData);
         const { user, token } = response.data;
-        
-        // Save token in cookie and user data in localStorage
-        setCookie('token', token, { expires: 7, sameSite: 'strict' });
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        setCookie('token', token);
+        setUser(user)
         navigate('/forum');
       } catch (err) {
-        // Error handling is done by axios interceptor, but we can set form errors if needed
-        console.error('Registration error:', err);
-        if (err.response?.data?.error) {
-          setErrors({ form: err.response.data.error });
+        if (err.response.data?.message) {
+          setErrors({ form: err.response.data?.message });
         }
       } finally {
         setLoading(false);

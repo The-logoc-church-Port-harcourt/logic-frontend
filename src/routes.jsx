@@ -76,7 +76,7 @@ export const routes = [
   },
   {
     path: '/forum',
-    element: <Forum />,
+    element: <ProtectedRoute> <Forum /> </ProtectedRoute> ,
     name: 'Forum',
     showInNav: false,
     showInFooter: false,

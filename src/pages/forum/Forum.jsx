@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { removeCookie } from '../../api/cookies';
+import { useAuth } from '../../context/AdminAuthContext';
 
 export default function Forum() {
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user , setUser} = useAuth()
   const [questions, setQuestions] = useState([]);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [newQuestionTitle, setNewQuestionTitle] = useState('');
@@ -23,9 +24,7 @@ export default function Forum() {
       
       try {
         // Fetch user profile
-        const userProfile = await api.get('/user/profile');
-        setCurrentUser(userProfile.data.user);
-        
+
         // Fetch questions list
         const questionsResponse = await api.get('/questions');
         const questionsData = questionsResponse.data.questions || questionsResponse.data;
@@ -53,7 +52,7 @@ export default function Forum() {
 
   const handleLogout = () => {
     removeCookie('token');
-    localStorage.removeItem('currentUser');
+    setUser(null)
     navigate('/forum/login');
   };
 
@@ -107,8 +106,7 @@ export default function Forum() {
         const response = await api.post(`/questions/${questionId}/comment`, {
           body: newAnswer
         });
-        console.log( response.data);
-        
+
         // The response should contain the new answer
         const newAnswerData = response.data.comment || response.data;
         
@@ -179,7 +177,29 @@ export default function Forum() {
     return text.substr(0, maxLength) + '...';
   };
 
-  if (loading.page && !currentUser) {
+  // Format date function
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    if (isNaN(date)) return '';
+
+    const nth = (d) => {
+      if (d > 3 && d < 21) return 'th';
+      switch (d % 10) {
+        case 1:  return "st";
+        case 2:  return "nd";
+        case 3:  return "rd";
+        default: return "th";
+      }
+    };
+
+    const day = date.getDate();
+    const dayWithSuffix = day + nth(day);
+
+    return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).replace(day, dayWithSuffix) + ', ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+  };
+
+  if (loading.page && !user) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
   }
 
@@ -187,7 +207,7 @@ export default function Forum() {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-red-500">Error: {error}</div>;
   }
 
-  if (!currentUser) {
+  if (!user) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Redirecting...</div>;
   }
 
@@ -200,16 +220,22 @@ export default function Forum() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex justify-between items-center">
               <span className="text-gray-700 whitespace-nowrap">
-                Welcome, {currentUser.firstName}
+                Welcome, {user.firstName}
               </span>
               <button
                 onClick={handleLogout}
-                className="text-sm text-red-600 hover:text-red-800 whitespace-nowrap"
+                className="text-sm text-red-600 hover:text-red-800 whitespace-nowrap block sm:hidden"
               >
                 Logout
               </button>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Community Forum</h1>
+              <button
+                onClick={handleLogout}
+                className="text-sm text-red-600 block sm:hidden hover:text-red-800 whitespace-nowrap"
+              >
+                Logout
+              </button>
           </div>
         </div>
       </header>
@@ -232,7 +258,7 @@ export default function Forum() {
               )}
               <div className="mt-4 text-sm text-gray-500">
                 Asked by {selectedQuestion.author?.firstName} {selectedQuestion.author?.lastName} • {selectedQuestion.timestamp}
-              </div>
+              </div> 
             </div>
             
             <div className="space-y-8">
@@ -281,7 +307,7 @@ export default function Forum() {
               <div className="mt-8 sm:mt-10 pt-6 border-t">
                 <div className="flex items-center mb-4 sm:mb-6">
                   <div className="h-10 w-10 rounded-full bg-gradient-red flex items-center justify-center text-white font-semibold mr-3 flex-shrink-0">
-                    {currentUser?.firstName?.charAt(0)}{currentUser?.lastName?.charAt(0)}
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
                   </div>
                   <h4 className="text-lg font-medium text-gray-900">Write your answer</h4>
                 </div>
@@ -434,7 +460,7 @@ export default function Forum() {
                   )}
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
                     <div className="text-sm text-gray-500">
-                      Asked by {question.author?.firstName} {question.author?.lastName} • {question.timestamp}
+                      Asked by {question.author?.firstName} {question.author?.lastName} • {formatTimestamp(question.createdAt)}
                     </div>
                     <button
                       onClick={() => handleViewQuestion(question)}
